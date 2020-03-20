@@ -1,0 +1,6 @@
+{
+  "execMap": {
+    "ts": "sucrase-node",
+    "js": "sucrase-node"
+  }
+}
