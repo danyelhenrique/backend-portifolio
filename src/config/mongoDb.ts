@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const connection = mongoose.connect(process.env.MONGO_URL, {
+const connection = mongoose.connect(process.env.MONGO_PRODUCTION_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-
 import Project from "../models/Project";
-class ProjectController extends global.AbsController {
+
+class ProjectController {
   async store(req: Request, res: Response): Promise<Response> {
     try {
       const project = await Project.create(req.body);

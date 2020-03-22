@@ -1,4 +1,5 @@
 import "./config/dotEnv";
+import "./config/mongoDb";
 
 import server from "./server";
 

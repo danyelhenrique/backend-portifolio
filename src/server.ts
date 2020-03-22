@@ -1,8 +1,9 @@
 import "./config/dotEnv";
-import "./config/mongoDb";
 
 import express, { Express } from "express";
+
 import routes from "./routes";
+import morganConfig from "./lib/morgan";
 
 class App {
   public app: Express;
@@ -13,6 +14,7 @@ class App {
   }
 
   private middlewares(): void {
+    this.app.use(morganConfig);
     this.app.use(express.json());
   }
 
