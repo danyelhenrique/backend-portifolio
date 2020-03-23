@@ -11,8 +11,9 @@ class SessionController {
     try {
       const { email, password } = req.body;
       const user = await User.findOne({ email }).select("+password");
+
       if (!user) {
-        return res.status(403);
+        return res.status(500).json({ err: "Fail to sigin" });
       }
 
       const user_password = String(user.password);
@@ -20,7 +21,7 @@ class SessionController {
       const checkPassword = bcrypt.compareSync(password, user_password);
 
       if (!checkPassword) {
-        return res.status(403);
+        return res.status(403).json({ err: "Fail to sigin" });
       }
 
       const payload = {
@@ -33,17 +34,7 @@ class SessionController {
 
       return res.json({ user, token });
     } catch (error) {
-      return res.status(500).json({ err: "Failed to create " });
-    }
-  }
-
-  async destroy(req: Request, res: Response): Promise<Response> {
-    try {
-      await User.findOneAndRemove({ _id: req.userId });
-
-      return res.status(200).send();
-    } catch (error) {
-      return res.status(500).json({ err: "Failed to create " });
+      return res.status(500).json({ err: "Failed to sigin " });
     }
   }
 }

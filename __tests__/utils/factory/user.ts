@@ -20,6 +20,7 @@ class Build {
   define(): void {
     factory.define("user", User, {
       name: faker.name.findName(),
+      email: faker.internet.email(),
       avatar_url: faker.internet.avatar(),
       password: faker.internet.password(3)
     });

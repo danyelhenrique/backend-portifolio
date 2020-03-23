@@ -1,7 +1,6 @@
 import "./config/dotEnv";
 
 import express, { Express } from "express";
-
 import routes from "./routes";
 import morganConfig from "./lib/morgan";
 

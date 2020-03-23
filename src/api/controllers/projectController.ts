@@ -14,7 +14,11 @@ class ProjectController {
 
   async update(req: Request, res: Response): Promise<Response> {
     try {
-      const project = await Project.create(req.body);
+      const data = req.body;
+
+      const project = await Project.findByIdAndUpdate(req.params.id, data, {
+        new: true
+      });
 
       return res.json({ project });
     } catch (error) {
@@ -24,7 +28,7 @@ class ProjectController {
 
   async show(req: Request, res: Response): Promise<Response> {
     try {
-      const project = await Project.create(req.body);
+      const project = await Project.findById(req.params.id);
 
       return res.json({ project });
     } catch (error) {
@@ -34,7 +38,7 @@ class ProjectController {
 
   async index(req: Request, res: Response): Promise<Response> {
     try {
-      const project = await Project.create(req.body);
+      const project = await Project.find();
 
       return res.json({ project });
     } catch (error) {
@@ -44,7 +48,7 @@ class ProjectController {
 
   async destroy(req: Request, res: Response): Promise<Response> {
     try {
-      const project = await Project.create(req.body);
+      const project = await Project.findOneAndRemove({ _id: req.params.id });
 
       return res.json({ project });
     } catch (error) {

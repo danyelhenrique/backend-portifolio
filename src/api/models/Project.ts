@@ -1,21 +1,25 @@
 import { Schema, model, Document } from "mongoose";
 
-interface IProject extends Document {
+export interface IProject extends Document {
   title: String;
   description: String;
-  background_ril: String;
+  background_url: String;
   deploy_url: String;
   github_url: String;
-  tag: [String];
+  tag: String[];
 }
 
 const Project = new Schema({
   title: String,
   description: String,
-  background_ril: String,
+  background_url: String,
   deploy_url: String,
   github_url: String,
-  tag: [String]
+  tag: [
+    {
+      type: String
+    }
+  ]
 });
 
 export default model<IProject>("Project", Project);

@@ -51,10 +51,11 @@ describe("@SESSION -> Should create token on user sigin", () => {
       .post("/signin")
       .send(user);
 
+    expect(Object.keys(response.body).toString()).toContain("user");
     expect(Object.keys(response.body).toString()).toContain("token");
   });
 
-  it("Should fail to create token with the wrong parameters return status 500 and failt  to sigin", async () => {
+  it("Should fail to create token with the empty parameters return status 500 and failt  to sigin", async () => {
     await Request(App)
       .post("/users")
       .send(user);
@@ -67,7 +68,36 @@ describe("@SESSION -> Should create token on user sigin", () => {
     expect(Object.keys(response.body).toString()).not.toContain("token");
   });
 
-  it("Should fail to create token with no password and return  status 500 and failt  to sigin", async () => {
+  it("Should fail to create token with the wrong password return status 403 and failt  to sigin", async () => {
+    await Request(App)
+      .post("/users")
+      .send(user);
+
+    const password =
+      "$2b$08$0EXB5tK8b.rSUcm5R.dgs..yCYHt9qj2Rf2wNWVslumOZh7O5Rs2a";
+
+    const response = await Request(App)
+      .post("/signin")
+      .send({ email: user.email, password });
+
+    expect(response.status).toBe(403);
+    expect(Object.keys(response.body).toString()).not.toContain("token");
+  });
+
+  it("Should fail to create token with the wrong email return status 500 and failt  to sigin", async () => {
+    await Request(App)
+      .post("/users")
+      .send(user);
+
+    const response = await Request(App)
+      .post("/signin")
+      .send({ email: "wrong@gmail.com" });
+
+    expect(response.status).toBe(500);
+    expect(Object.keys(response.body).toString()).not.toContain("token");
+  });
+
+  it("Should fail to create token with no password and return status 500 and failt  to sigin", async () => {
     await Request(App)
       .post("/users")
       .send(user);
