@@ -1,34 +1,43 @@
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
 
 import Request from "supertest";
 import Server from "./../../src/server";
-
 import jestMongo from "../../src/config/jestMongo";
-import Project, { IProject } from "../../src/api/models/Project";
-import ProjectFactory from "../utils/factory/project";
+
 import User, { IUser } from "../../src/api/models/User";
+
+import Project, { TProject, TTag } from "../../src/api/models/Project";
+
+import ProjectFactory from "../utils/factory/project";
 import UserFactory from "../utils/factory/user";
+import TagFactory from "../utils/factory/tag";
 
 const App = Server.app;
 const projectFactory: ProjectFactory = new ProjectFactory();
 const userFactory: UserFactory = new UserFactory();
+const tagFactory: TagFactory = new TagFactory();
 
 let user: IUser;
-let project: IProject;
+let project: TProject;
+let tag: TTag;
+
 describe("@PROJECT -> Should create read update and delete project", () => {
   beforeAll(async () => {
     try {
       console.log("intialization connection");
+
       const url = await jestMongo();
       await mongoose.connect(url, {
         useNewUrlParser: true,
         useCreateIndex: true,
         useUnifiedTopology: true
       });
+
       project = await projectFactory.generate;
       user = await userFactory.generate;
+      tag = await tagFactory.generate;
     } catch (error) {
-      console.log("Fail to intit mongoJest");
+      console.log("Fail to intit mongoJest", error);
     }
   });
 
@@ -54,23 +63,37 @@ describe("@PROJECT -> Should create read update and delete project", () => {
       .post("/users")
       .send(user);
 
+    // console.log("user USER", newUser.body);
+
     const { body } = await Request(App)
       .post("/signin")
       .send(user);
 
-    const response = await Request(App)
-      .post("/users/projects")
-      .set("authorization", `bearer ${body.token}`)
-      .send(project);
+    // console.log("body USER", body);
+    // console.log("project USER", project);
 
-    expect(response.status).toBe(200);
-    expect(response.body.project).toMatchObject({
+    const data = {
       title: project.title,
       description: project.description,
       background_url: project.background_url,
       deploy_url: project.deploy_url,
       github_url: project.github_url,
-      tag: [project.tag[0], project.tag[1]]
+      tag: tag.name
+    };
+
+    const response = await Request(App)
+      .post("/users/projects")
+      .set("authorization", `bearer ${body.token}`)
+      .send(data);
+
+    expect(response.status).toBe(200);
+
+    expect(response.body.project).toMatchObject({
+      title: project.title,
+      description: project.description,
+      background_url: project.background_url,
+      deploy_url: project.deploy_url,
+      github_url: project.github_url
     });
   });
 
@@ -83,10 +106,19 @@ describe("@PROJECT -> Should create read update and delete project", () => {
       .post("/signin")
       .send(user);
 
+    const data = {
+      title: project.title,
+      description: project.description,
+      background_url: project.background_url,
+      deploy_url: project.deploy_url,
+      github_url: project.github_url,
+      tag: tag.name
+    };
+
     const post = await Request(App)
       .post("/users/projects")
       .set("authorization", `bearer ${body.token}`)
-      .send(project);
+      .send(data);
 
     const postId = post.body.project._id;
 
@@ -104,8 +136,7 @@ describe("@PROJECT -> Should create read update and delete project", () => {
       description: project.description,
       background_url: project.background_url,
       deploy_url: UPDATEPROJECT.deploy_url,
-      github_url: project.github_url,
-      tag: [project.tag[0], project.tag[1]]
+      github_url: project.github_url
     });
   });
 
@@ -118,10 +149,19 @@ describe("@PROJECT -> Should create read update and delete project", () => {
       .post("/signin")
       .send(user);
 
+    const data = {
+      title: project.title,
+      description: project.description,
+      background_url: project.background_url,
+      deploy_url: project.deploy_url,
+      github_url: project.github_url,
+      tag: tag.name
+    };
+
     const post = await Request(App)
       .post("/users/projects")
       .set("authorization", `bearer ${body.token}`)
-      .send(project);
+      .send(data);
 
     const postId = post.body.project._id;
 
@@ -137,8 +177,7 @@ describe("@PROJECT -> Should create read update and delete project", () => {
       description: project.description,
       background_url: project.background_url,
       deploy_url: project.deploy_url,
-      github_url: project.github_url,
-      tag: [project.tag[0], project.tag[1]]
+      github_url: project.github_url
     });
 
     expect(response.body.project).toEqual(post.body.project);
@@ -159,7 +198,7 @@ describe("@PROJECT -> Should create read update and delete project", () => {
       background_url: "http://background_url",
       deploy_url: "http://deploy_url",
       github_url: "http://github_url",
-      tag: ["tag1", "ta2"]
+      tag: "tag1, ta2"
     };
 
     const secondProject = {
@@ -168,7 +207,7 @@ describe("@PROJECT -> Should create read update and delete project", () => {
       background_url: "http://background_url/second",
       deploy_url: "http://deploy_url/second",
       github_url: "http://github_url/second",
-      tag: ["tag1/second", "ta2/second"]
+      tag: "tag1/second,ta2/second"
     };
 
     const secondThree = {
@@ -177,7 +216,7 @@ describe("@PROJECT -> Should create read update and delete project", () => {
       background_url: "http://background_url/three",
       deploy_url: "http://deploy_url/three",
       github_url: "http://github_url/three",
-      tag: ["tag1/three", "ta2/three"]
+      tag: "tag1/three, ta2/three"
     };
 
     /*
@@ -207,10 +246,10 @@ describe("@PROJECT -> Should create read update and delete project", () => {
 
     expect(response.status).toBe(200);
 
-    expect(response.body.project).toEqual([
-      { ...first.body.project },
+    expect(response.body.projects).toMatchObject([
+      { ...three.body.project },
       { ...second.body.project },
-      { ...three.body.project }
+      { ...first.body.project }
     ]);
   });
 
@@ -229,7 +268,7 @@ describe("@PROJECT -> Should create read update and delete project", () => {
       background_url: "http://background_url",
       deploy_url: "http://deploy_url",
       github_url: "http://github_url",
-      tag: ["tag1", "ta2"]
+      tag: "tag1, ta2"
     };
 
     const secondProject = {
@@ -238,7 +277,7 @@ describe("@PROJECT -> Should create read update and delete project", () => {
       background_url: "http://background_url/second",
       deploy_url: "http://deploy_url/second",
       github_url: "http://github_url/second",
-      tag: ["tag1/second", "ta2/second"]
+      tag: "tag1/second,ta2/second"
     };
 
     const secondThree = {
@@ -247,7 +286,7 @@ describe("@PROJECT -> Should create read update and delete project", () => {
       background_url: "http://background_url/three",
       deploy_url: "http://deploy_url/three",
       github_url: "http://github_url/three",
-      tag: ["tag1/three", "ta2/three"]
+      tag: "tag1/three, ta2/three"
     };
 
     /*
@@ -255,12 +294,12 @@ describe("@PROJECT -> Should create read update and delete project", () => {
      * why Supertest lib bug
      */
 
-    const first = await Request(App)
+    await Request(App)
       .post("/users/projects")
       .set("authorization", `bearer ${body.token}`)
       .send(firstProject);
 
-    const second = await Request(App)
+    await Request(App)
       .post("/users/projects")
       .set("authorization", `bearer ${body.token}`)
       .send(secondProject);
