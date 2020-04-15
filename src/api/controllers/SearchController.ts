@@ -16,7 +16,7 @@ class SearchController {
     }
 
     const project = await Project.find({
-      title: { $regex: title, $options: "i" }
+      title: { $regex: title, $options: "i" },
     });
 
     if (!project || project.length <= 0) {

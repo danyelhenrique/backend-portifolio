@@ -3,19 +3,20 @@ import mongoose from "mongoose";
 
 import bcrypt from "bcrypt";
 
-import User, { IUser } from "../models/User";
+import User from "../models/User";
 
-declare global {
-  namespace Express {
-    interface Request {
-      body: IUser;
-      userId: mongoose.Types.ObjectId;
-    }
-  }
+interface IPayload {
+  _id: mongoose.Types.ObjectId;
+  name: String;
+  email: String;
+}
+
+interface IRequest extends Request {
+  userId?: IPayload | mongoose.Types.ObjectId;
 }
 
 class UserController {
-  async store(req: Request, res: Response): Promise<Response> {
+  async store(req: IRequest, res: Response): Promise<Response> {
     try {
       const { name, avatar_url, email, password } = req.body;
 
@@ -25,7 +26,7 @@ class UserController {
         name,
         avatar_url,
         email,
-        password: password_hash
+        password: password_hash,
       });
 
       return res.json({ user });
@@ -34,7 +35,7 @@ class UserController {
     }
   }
 
-  async update(req: Request, res: Response): Promise<Response> {
+  async update(req: IRequest, res: Response): Promise<Response> {
     try {
       const data = req.body;
 
@@ -50,17 +51,16 @@ class UserController {
 
       return res.json({ user });
     } catch (error) {
-
       return res.status(500).json({ err: "Failed to update " });
     }
   }
 
-  async show(req: Request, res: Response): Promise<Response> {
+  async show(req: IRequest, res: Response): Promise<Response> {
     try {
       const user = await User.findById(req.userId);
 
       if (!user) {
-        return res.status(500).json({ err: "Failed to update " });
+        return res.status(500).json({ err: "Failed to show " });
       }
 
       return res.json({ user });
@@ -69,7 +69,7 @@ class UserController {
     }
   }
 
-  async destroy(req: Request, res: Response): Promise<Response> {
+  async destroy(req: IRequest, res: Response): Promise<Response> {
     try {
       const user = await User.findOneAndRemove({ _id: req.userId });
 

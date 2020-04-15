@@ -10,7 +10,6 @@ class SessionController {
   async store(req: Request, res: Response): Promise<Response> {
     try {
       const { email, password } = req.body;
-
       const user = await User.findOne({ email }).select("+password");
 
       if (!user) {
