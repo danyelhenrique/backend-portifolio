@@ -38,9 +38,11 @@ class UserController {
     try {
       const data = req.body;
 
-      const user = await User.findByIdAndUpdate(req.userId, data, {
-        new: true
-      });
+      const user = await User.findOneAndUpdate(
+        { _id: req.userId },
+        { $set: { ...data } },
+        { new: true }
+      );
 
       if (!user) {
         return res.status(500).json({ err: "Failed to update " });
@@ -48,6 +50,7 @@ class UserController {
 
       return res.json({ user });
     } catch (error) {
+
       return res.status(500).json({ err: "Failed to update " });
     }
   }
