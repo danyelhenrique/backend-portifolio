@@ -4,7 +4,19 @@ import Project from "../models/Project";
 class ProjectController {
   async store(req: Request, res: Response): Promise<Response> {
     try {
-      const project = await Project.create(req.body);
+      const data = { ...req.body };
+      const formatedTag =
+        data &&
+        data.tag &&
+        data.tag
+          .trim()
+          .toLowerCase()
+          .split(",")
+          .map((tag: string) => ({ name: tag }));
+
+      data.tag = formatedTag;
+
+      const project = await Project.create(data);
 
       return res.json({ project });
     } catch (error) {
@@ -14,7 +26,18 @@ class ProjectController {
 
   async update(req: Request, res: Response): Promise<Response> {
     try {
-      const data = req.body;
+      const data = { ...req.body };
+
+      const formatedTag =
+        data &&
+        data.tag &&
+        data.tag
+          .trim()
+          .toLowerCase()
+          .split(",")
+          .map((tag: string) => ({ name: tag }));
+
+      data.tag = formatedTag;
 
       const project = await Project.findByIdAndUpdate(req.params.id, data, {
         new: true
@@ -32,15 +55,15 @@ class ProjectController {
 
       return res.json({ project });
     } catch (error) {
-      return res.status(500).json({ err: "Failed to create " });
+      return res.status(500).json({ err: "Failed to Show " });
     }
   }
 
   async index(req: Request, res: Response): Promise<Response> {
     try {
-      const project = await Project.find();
+      const projects = await Project.find().sort({ createdAt: "desc" });
 
-      return res.json({ project });
+      return res.json({ projects });
     } catch (error) {
       return res.status(500).json({ err: "Failed to create " });
     }
