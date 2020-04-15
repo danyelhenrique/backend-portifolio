@@ -2,14 +2,13 @@ import dotEnv from "dotenv";
 import { resolve } from "path";
 const isTest = process.env.NODE_ENV === "test";
 const isDev = process.env.NODE_ENV === "development";
-const isProd = process.env.NODE_ENV === "production";
 
 const testPath = resolve(__dirname, "..", "..", ".env.test");
 const devPath = resolve(__dirname, "..", "..", ".env.dev");
 const prodPath = resolve(__dirname, "..", "..", "..", ".env");
 
 const config = dotEnv.config({
-  debug: !isProd,
+  debug: process.env.NODE_ENV !== "production",
   path: (isDev && devPath) || (isTest && testPath) || prodPath,
 });
 
