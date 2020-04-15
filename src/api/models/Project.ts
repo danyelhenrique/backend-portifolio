@@ -1,17 +1,18 @@
 import { Schema, model, Document } from "mongoose";
 
+export interface ITag extends Document {
+  name: String;
+  _id: Schema.Types.ObjectId;
+}
+
 export interface IProject extends Document {
+  _id: Schema.Types.ObjectId;
   title: String;
   description: String;
   background_url: String;
   deploy_url: String;
   github_url: String;
-  tag: ITag[];
-}
-
-export interface ITag extends Document {
-  name: String;
-  _id: Schema.Types.ObjectId;
+  tag?: ITag[];
 }
 
 export type TProject = Document & {
@@ -20,7 +21,7 @@ export type TProject = Document & {
   background_url: String;
   deploy_url: String;
   github_url: String;
-  tag: ITag[];
+  tag?: ITag[];
 };
 
 export type TTag = ITag & Document;
@@ -29,7 +30,7 @@ export type TProjectWithTag = Document & TProject & TTag[];
 
 const TagSchema = new Schema(
   {
-    name: { type: String }
+    name: { type: String },
   },
   { timestamps: true }
 );
@@ -38,26 +39,26 @@ const ProjectSchema = new Schema(
   {
     title: {
       type: String,
-      required: true
+      required: true,
     },
     description: {
       type: String,
-      required: true
+      required: true,
     },
     background_url: {
       type: String,
-      required: true
+      required: true,
     },
     deploy_url: String,
     github_url: String,
-    tag: [TagSchema]
+    tag: [TagSchema],
   },
   { timestamps: true }
 );
 
-const Project = model<TProjectWithTag>("Project", ProjectSchema);
+const Project = model<IProject | ITag>("Project", ProjectSchema);
 
-const Tag = model<TTag>("Tag", TagSchema);
+const Tag = model<ITag>("Tag", TagSchema);
 
 export default Project;
 
