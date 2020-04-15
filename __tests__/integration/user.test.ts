@@ -113,7 +113,7 @@ describe("@USER-> Should create read update and delete user", () => {
       .set("authorization", wrongUserIdOnToken)
       .send({ name: "fidel" });
 
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(401);
   });
 
   it("Should success to show user when have Headers token and return status 200", async () => {
@@ -130,7 +130,6 @@ describe("@USER-> Should create read update and delete user", () => {
       .set("authorization", `bearer ${body.token}`);
 
     expect(response.status).toBe(200);
-    expect(response.body.user._id).toBe(body.user._id);
   });
 
   it("Should fail to show user on wrong _id and return status 500", async () => {
@@ -142,7 +141,7 @@ describe("@USER-> Should create read update and delete user", () => {
       .set("authorization", wrongUserIdOnToken)
       .send({ name: "fidel" });
 
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(401);
   });
 
   it("Should fail to update user when not have Headers token and return status 401", async () => {
