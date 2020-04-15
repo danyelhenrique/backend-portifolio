@@ -1,6 +1,8 @@
 import "./config/dotEnv";
 
 import express, { Express } from "express";
+import cors from "cors";
+
 import routes from "./routes";
 import morganConfig from "./lib/morgan";
 
@@ -13,6 +15,7 @@ class App {
   }
 
   private middlewares(): void {
+    this.app.use(cors());
     this.app.use(morganConfig);
     this.app.use(express.json());
   }
