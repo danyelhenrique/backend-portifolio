@@ -1,6 +1,16 @@
-import dotEnv from 'dotenv';
+import dotEnv from "dotenv";
+import { resolve } from "path";
+const isTest = process.env.NODE_ENV === "test";
+const isDev = process.env.NODE_ENV === "development";
+const isProd = process.env.NODE_ENV === "production";
 
-const config = dotEnv.config();
+const testPath = resolve(__dirname, "..", "..", ".env.test");
+const devPath = resolve(__dirname, "..", "..", ".env.dev");
+const prodPath = resolve(__dirname, "..", "..", "..", ".env");
 
+const config = dotEnv.config({
+  debug: !isProd,
+  path: (isDev && devPath) || (isTest && testPath) || prodPath,
+});
 
 export default config;
