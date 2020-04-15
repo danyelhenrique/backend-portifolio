@@ -5,12 +5,16 @@ import jwt from "jsonwebtoken";
 import { promisify } from "util";
 
 interface IPayload {
-  id: mongoose.Types.ObjectId;
-  name: String;
-  email: String;
+  _id?: mongoose.Types.ObjectId;
+  name?: String;
+  email?: String;
 }
 
-export default async (req: Request, res: Response, next: NextFunction) => {
+interface IRequest extends Request {
+  userId?: IPayload | mongoose.Types.ObjectId;
+}
+
+export default async (req: IRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
@@ -23,7 +27,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
   try {
     const decoded = await jwtAsync(token, "secret");
 
-    req.userId = (<IPayload>decoded).id;
+    req.userId = (<IPayload>decoded)._id;
 
     return next();
   } catch (error) {
