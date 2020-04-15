@@ -10,6 +10,7 @@ class SessionController {
   async store(req: Request, res: Response): Promise<Response> {
     try {
       const { email, password } = req.body;
+
       const user = await User.findOne({ email }).select("+password");
 
       if (!user) {
@@ -27,14 +28,32 @@ class SessionController {
       const payload = {
         id: user.id,
         name: user.name,
-        email: user.email
+        email: user.email,
       };
 
       const token = jwt.sign(payload, "secret", { expiresIn: "7d" });
 
-      return res.json({ user, token });
+      return res.json({
+        user: {
+          ...payload,
+          avatar_url: user.avatar_url,
+        },
+        token,
+      });
     } catch (error) {
       return res.status(500).json({ err: "Failed to sigin " });
+    }
+  }
+
+  async show(req: Request, res: Response): Promise<Response> {
+    const authHeader = req.headers.authorization?.split(" ") || [];
+    const token = authHeader[1];
+
+    try {
+      jwt.verify(token, "secret");
+      return res.status(200).send();
+    } catch (error) {
+      return res.status(401).json({ err: "Invalid token" });
     }
   }
 }
