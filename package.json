@@ -7,7 +7,7 @@
     "preset": "ts-jest",
     "test": "cross-env NODE_ENV=test jest --watch --detectOpenHandles",
     "dev": "cross-env NODE_ENV=development nodemon src/index.ts",
-    "start": "cross-env NODE_ENV=production node build/src/index.js",
+    "start": "cross-env NODE_ENV=production node dist/src/index.js",
     "build": "tsc -p ."
   },
   "husky": {
