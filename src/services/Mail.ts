@@ -21,7 +21,7 @@ interface ISendMail {
   text?: string;
   html?: string;
   from: string;
-  to: string;
+  to: string | undefined;
 }
 
 const defaultValues: IMailConfig = {
