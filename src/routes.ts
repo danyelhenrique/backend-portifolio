@@ -7,11 +7,14 @@ import tagController from "./api/controllers/tagController";
 import SearchController from "./api/controllers/SearchController";
 import FilterController from "./api/controllers/FilterController";
 
+import ContactController from "./api/controllers/ContactController";
+
 import auth from "./api/middlewares/auth";
 
 const router = Router();
 
 router.get("/", (req, res) => res.json({ msg: "Server is Running" }));
+router.post("/contact", ContactController.store);
 
 router.post("/signin", sessionController.store);
 router.get("/verify", sessionController.show);
